@@ -52,8 +52,8 @@ extension Data {
     Data( Digest.sha3(bytes, variant: variant))
   }
 
-  public func crc32(seed: UInt32? = nil, reflect: Bool = true) -> Data {
-    Data( Checksum.crc32(bytes, seed: seed, reflect: reflect).bytes())
+  public func crc32(customPoly: UInt32? = nil, seed: UInt32? = nil, reflect: Bool = true) -> Data {
+    Data( Checksum.crc32(bytes, customPoly: customPoly, seed: seed, reflect: reflect).bytes())
   }
 
   public func crc32c(seed: UInt32? = nil, reflect: Bool = true) -> Data {

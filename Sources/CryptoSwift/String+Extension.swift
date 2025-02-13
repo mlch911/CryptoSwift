@@ -59,8 +59,8 @@ extension String {
   }
 
   @inlinable
-  public func crc32(seed: UInt32? = nil, reflect: Bool = true) -> String {
-    self.bytes.crc32(seed: seed, reflect: reflect).bytes().toHexString()
+  public func crc32(customPoly: UInt32? = nil, seed: UInt32? = nil, reflect: Bool = true) -> String {
+      self.bytes.crc32(customPoly: customPoly, seed: seed, reflect: reflect).bytes().toHexString()
   }
 
   @inlinable

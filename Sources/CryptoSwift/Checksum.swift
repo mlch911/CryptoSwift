@@ -131,12 +131,20 @@ public final class Checksum {
 
   /// Polynomial: 0xEDB88320 (Reversed) - IEEE
   @inlinable
-  func crc32(_ message: Array<UInt8>, seed: UInt32? = nil, reflect: Bool = true) -> UInt32 {
+  func crc32(_ message: Array<UInt8>, customPoly: UInt32? = nil, seed: UInt32? = nil, reflect: Bool = true) -> UInt32 {
     var crc: UInt32 = seed != nil ? seed! : 0xFFFF_FFFF
+
+    var table32: [UInt32] = Checksum.table32
+    if let customPoly {
+      // 如果提供了自定义多项式，将其反转；否则使用标准的反转多项式
+      let poly = reflect ? reversed(customPoly) : customPoly
+      table32 = createTable32(customPoly: poly)
+    }
+
     for chunk in message.batched(by: 256) {
       for b in chunk {
         let idx = Int((crc ^ UInt32(reflect ? b : reversed(b))) & 0xFF)
-        crc = (crc >> 8) ^ Checksum.table32[idx]
+        crc = (crc >> 8) ^ table32[idx]
       }
     }
     return (reflect ? crc : reversed(crc)) ^ 0xFFFF_FFFF
@@ -179,8 +187,8 @@ public extension Checksum {
   ///
   /// - returns: Calculated code
   @inlinable
-  static func crc32(_ message: Array<UInt8>, seed: UInt32? = nil, reflect: Bool = true) -> UInt32 {
-    Checksum().crc32(message, seed: seed, reflect: reflect)
+  static func crc32(_ message: Array<UInt8>, customPoly: UInt32? = nil, seed: UInt32? = nil, reflect: Bool = true) -> UInt32 {
+    Checksum().crc32(message, customPoly: customPoly, seed: seed, reflect: reflect)
   }
 
   /// Calculate CRC32C
@@ -205,4 +213,21 @@ public extension Checksum {
   static func crc16(_ message: Array<UInt8>, seed: UInt16? = nil) -> UInt16 {
     Checksum().crc16(message, seed: seed)
   }
+}
+
+@inlinable
+func createTable32(customPoly: UInt32) -> [UInt32] {
+    var table = [UInt32](repeating: 0, count: 256)
+    for i in 0..<256 {
+        var crc = UInt32(i)
+        for _ in 0..<8 {
+            if (crc & 1) != 0 {
+                crc = (crc >> 1) ^ customPoly
+            } else {
+                crc = crc >> 1
+            }
+        }
+        table[i] = crc
+    }
+    return table
 }

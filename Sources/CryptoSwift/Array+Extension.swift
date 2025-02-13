@@ -129,8 +129,8 @@ extension Array where Element == UInt8 {
     Digest.sha3(self, variant: variant)
   }
 
-  public func crc32(seed: UInt32? = nil, reflect: Bool = true) -> UInt32 {
-    Checksum.crc32(self, seed: seed, reflect: reflect)
+  public func crc32(customPoly: UInt32? = nil, seed: UInt32? = nil, reflect: Bool = true) -> UInt32 {
+    Checksum.crc32(self, customPoly: customPoly, seed: seed, reflect: reflect)
   }
 
   public func crc32c(seed: UInt32? = nil, reflect: Bool = true) -> UInt32 {
